@@ -1,6 +1,8 @@
+import 'package:fchat/r_button.dart';
 import 'package:fchat/screens/loginscreen.dart';
 import 'package:fchat/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const String id = 'welcome_screen';
@@ -19,14 +21,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     controller =
-        AnimationController(duration: const Duration(seconds: 2), vsync: this);
-
+        AnimationController(duration: const Duration(seconds: 1), vsync: this);
     //animation = CurvedAnimation(parent: controller, curve: Curves.decelerate);
-    animation =
-        ColorTween(begin: Colors.black, end: Colors.white).animate(controller);
-
+    animation = ColorTween(begin: Colors.blueGrey, end: Colors.white)
+        .animate(controller);
     controller.forward();
-
     //animation.addStatusListener((status) {
     //if (status == AnimationStatus.completed) {
     //controller.reverse(from: 1.0);
@@ -34,7 +33,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     //controller.forward();
     //}
     //});
-
     controller.addListener(() {
       setState(() {});
       print(animation.value);
@@ -58,68 +56,47 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+
             Row(
               children: <Widget>[
                 Hero(
                   tag: 'logo',
                   child: Container(
                     child: Image.asset('images/logo.png'),
-                    height:60,
+                    height: 60,
                   ),
                 ),
-                const Text(
-                  ' Chat App',
-                  style: TextStyle(
-                    fontSize: 40.0,
-                    color: Colors.blueGrey,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
+                AnimatedTextKit(animatedTexts: [
+                  TypewriterAnimatedText(' Chat App',
+                      textStyle: const TextStyle(
+                        fontSize: 40.0,
+                        color: Colors.blueGrey,
+                        fontWeight: FontWeight.w900,
+                      )),
+                ]),
               ],
             ),
+
             const SizedBox(
               height: 48.0,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                elevation: 5.0,
-                color: Colors.purpleAccent,
-                borderRadius: BorderRadius.circular(30.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()));
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: const Text(
-                    'Log In',
-                  ),
-                ),
-              ),
+
+            Rounded(title: 'Log In',colour: Colors.purpleAccent,onPressed:(){
+            Navigator.push(context,
+            MaterialPageRoute(builder: (context) => LoginScreen()));
+          },),
+
+
+          const SizedBox(height: 10,),
+          Rounded(
+              title: 'Register',
+              colour: Colors.greenAccent,
+              onPressed: () {
+              Navigator.push(context,
+              MaterialPageRoute(builder: (context) => RegistrationScreen()));
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(30.0),
-                elevation: 5.0,
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegistrationScreen()));
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: const Text(
-                    'Register',
-                  ),
-                ),
-              ),
-            ),
+            
           ],
         ),
       ),
