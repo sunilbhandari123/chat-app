@@ -3,12 +3,16 @@ import 'package:fchat/screens/chatscreen.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const  String id = 'loginscreen';
+  static const String id = 'loginscreen';
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  
+  late String Email;
+  late String Password;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,19 +34,31 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 48.0,
             ),
             TextField(
+              textAlign:
+                TextAlign.center,
+                keyboardType:
+                TextInputType.emailAddress,
               onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration:kTextFieldDecoration.copyWith(hintText: 'Enter your mail'),
+                  Email = value;
+                },
+              
+              decoration:
+                  kTextFieldDecoration.copyWith(hintText: 'Enter your mail'),
             ),
             const SizedBox(
               height: 8.0,
             ),
-            TextField(
+            TextField( 
+              textAlign:
+                TextAlign.center,
+                obscureText:
+                true,
               onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration:kTextFieldDecoration.copyWith(hintText: 'Enter your password'),
+                  Password = value;
+   },
+              
+              decoration: kTextFieldDecoration.copyWith(
+                  hintText: 'Enter your password'),
             ),
             const SizedBox(
               height: 24.0,
