@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp( FlashChat());
+  runApp( flashChat());
 }
 
-class FlashChat extends StatelessWidget {
+class flashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
