@@ -16,8 +16,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-   User ?loggedInUser;
-  
+  User? loggedInUser;
+
   late String messageText;
 
   void getCurrentUser() async {
@@ -31,6 +31,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void messageStream() async {
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +48,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                _auth.signOut();
-                Navigator.pushNamed(context, LoginScreen.id);
+                //     _auth.signOut();
+                //   Navigator.pushNamed(context, LoginScreen.id);
+                messageStream();
               }),
         ],
         title: const Text('⚡️Chat'),
@@ -60,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        messageText=value;
+                        messageText = value;
                       },
                       decoration: kMessageTextFieldDecoration,
                     ),
@@ -68,12 +77,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   FlatButton(
                     onPressed: () {
                       //Implement send functionality.
-                       
-                       _firestore.collection('messages').add(
-                            {
-                              'text': messageText,
-                              'Sender': loggedInUser?.email});
-                      
+
+                      _firestore.collection('messages').add(
+                          {'text': messageText, 'Sender': loggedInUser?.email});
                     },
                     child: const Text(
                       'Send',
