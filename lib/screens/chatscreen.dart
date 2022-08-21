@@ -14,7 +14,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
-  User? loggedInUser;
+   late User loggedInUser;
 
   late String messageText;
 
@@ -26,6 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       print(e);
+      
     }
   }
 
@@ -74,9 +75,9 @@ class _ChatScreenState extends State<ChatScreen> {
               List<MessageBubble> messageBubbles = [];
               for (var message in messages!) {
                 final messageText = message['text'];
-                //final messagesender = message['Sender'];
+                final messagesender = message['Sender'];
                 final messageBubble =
-                    MessageBubble(/*Sender: messagesender*/ text: messageText);
+                    MessageBubble(Sender: messagesender, text: messageText);
                 messageBubbles.add(messageBubble);
               }
               return Expanded(
@@ -107,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     //Implement send functionality.
                     messageTextController.clear();
                     _firestore.collection('messages').add(
-                        {'text': messageText, 'Sender': loggedInUser?.email});
+                        {'text': messageText, 'Sender': loggedInUser.email});
                   },
                   child: const Text(
                     'Send',
@@ -124,8 +125,8 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({/*required this.Sender*/ required this.text});
-  //final String Sender;
+  MessageBubble({required this.Sender, required this.text});
+  final String Sender;
   final String text;
 
   @override
@@ -135,6 +136,7 @@ class MessageBubble extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children:<Widget> [
+          Text(Sender),
           Material(
               elevation: 5.0,
               borderRadius: BorderRadius.circular(30),
