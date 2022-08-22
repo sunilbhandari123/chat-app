@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fchat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+final _firestore = FirebaseFirestore.instance;
+late User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chatscreen';
-
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -13,10 +14,14 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
-   late User loggedInUser;
+  
 
   late String messageText;
+  @override
+  void initState() {
+    getCurrentUser();
+    super.initState();
+  }
 
   void getCurrentUser() async {
     try {
@@ -26,7 +31,6 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       print(e);
-      
     }
   }
 
@@ -76,13 +80,19 @@ class _ChatScreenState extends State<ChatScreen> {
               for (var message in messages!) {
                 final messageText = message['text'];
                 final messagesender = message['Sender'];
+
+                final currentUser = loggedInUser.email;
+                if (currentUser == messagesender) {}
+
                 final messageBubble =
-                    MessageBubble(Sender: messagesender, text: messageText);
+                    MessageBubble(Sender: messagesender, text: messageText,
+                    me:currentUser==messagesender);
                 messageBubbles.add(messageBubble);
               }
               return Expanded(
                 child: ListView(children: [
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: messageBubbles,
                   ),
                 ]),
@@ -105,7 +115,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 FlatButton(
                   onPressed: () {
-                    //Implement send functionality.
                     messageTextController.clear();
                     _firestore.collection('messages').add(
                         {'text': messageText, 'Sender': loggedInUser.email});
@@ -125,9 +134,10 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({required this.Sender, required this.text});
+  MessageBubble({required this.Sender, required this.text, required this.me});
   final String Sender;
   final String text;
+  final bool me;
 
   @override
   Widget build(BuildContext context) {
@@ -135,16 +145,29 @@ class MessageBubble extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        children:<Widget> [
-          Text(Sender),
+        children: <Widget>[
+          Text(
+            Sender,
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 13,
+            ),
+          ),
           Material(
               elevation: 5.0,
-              borderRadius: BorderRadius.circular(30),
-              color: Color.fromARGB(255, 145, 117, 107),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+              color:me? const Color.fromARGB(255, 145, 117, 107):Colors.lightBlueAccent,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                child: Text(text,style: const TextStyle(color: Colors.white),),
+                child: Text(
+                  text,
+                  style:TextStyle(
+                    color:me? Colors.white:Colors.black54)
+                ),
               )),
         ],
       ),
