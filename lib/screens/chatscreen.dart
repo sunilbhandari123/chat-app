@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fchat/constants.dart';
+import 'package:fchat/screens/loginscreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 final _firestore = FirebaseFirestore.instance;
 late User loggedInUser;
 
@@ -14,7 +16,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  
 
   late String messageText;
   @override
@@ -34,13 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void messageStream() async {
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
-      for (var message in snapshot.docs) {
-        print(message.data());
-      }
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +46,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                //     _auth.signOut();
-                //   Navigator.pushNamed(context, LoginScreen.id);
-                messageStream();
+                  _auth.signOut();
+                  Navigator.pushNamed(context, LoginScreen.id);
+                
               }),
         ],
         title: const Text('⚡️Chat'),
@@ -75,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 );
               }
 
-              final messages = snapshot.data?.docs;
+              final messages = snapshot.data?.docs.reversed;
               List<MessageBubble> messageBubbles = [];
               for (var message in messages!) {
                 final messageText = message['text'];
@@ -84,18 +79,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 final currentUser = loggedInUser.email;
                 if (currentUser == messagesender) {}
 
-                final messageBubble =
-                    MessageBubble(Sender: messagesender, text: messageText,
-                    me:currentUser==messagesender);
+                final messageBubble = MessageBubble(
+                    Sender: messagesender,
+                    text: messageText,
+                    me: currentUser == messagesender);
                 messageBubbles.add(messageBubble);
               }
               return Expanded(
-                child: ListView(children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: messageBubbles,
-                  ),
-                ]),
+                child: ListView(
+                  reverse: true,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  children: messageBubbles,
+                ),
               );
             },
           ),
@@ -134,7 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({required this.Sender, required this.text, required this.me});
+  const MessageBubble({required this.Sender, required this.text, required this.me});
   final String Sender;
   final String text;
   final bool me;
@@ -144,7 +140,9 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment:
+            me ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        //mainAxisAlignment: me?MainAxisAlignment.end:MainAxisAlignment.start,
         children: <Widget>[
           Text(
             Sender,
@@ -159,15 +157,14 @@ class MessageBubble extends StatelessWidget {
                   topLeft: Radius.circular(30.0),
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
-              color:me? const Color.fromARGB(255, 145, 117, 107):Colors.lightBlueAccent,
+              color:
+                  me ? const Color.fromARGB(255, 145, 117, 107) : Colors.white,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                child: Text(
-                  text,
-                  style:TextStyle(
-                    color:me? Colors.white:Colors.black54)
-                ),
+                child: Text(text,
+                    style:
+                        TextStyle(color: me ? Colors.white : Colors.black54)),
               )),
         ],
       ),
